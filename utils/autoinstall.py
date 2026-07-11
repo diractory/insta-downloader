@@ -1,45 +1,30 @@
-"""
-#RADHEY — Auto Dependency Installer
-"""
-
-import importlib
-import subprocess
-import sys
+import importlib, subprocess, sys
 
 REQUIRED_PACKAGES = {
     "pyrogram": "pyrofork",
     "tgcrypto": "TgCrypto",
-    "yt_dlp": "yt-dlp",
+    "yt_dlp":   "yt-dlp",
     "instaloader": "instaloader",
-    "flask": "flask",
+    "flask":    "flask",
     "requests": "requests",
-    "dotenv": "python-dotenv",
-    "PIL": "Pillow",
+    "dotenv":   "python-dotenv",
+    "PIL":      "Pillow",
 }
 
-
-def _pip_install(pip_name: str) -> bool:
+def _install(pkg):
     try:
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "-q", pip_name]
-        )
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", pkg])
         return True
     except Exception as e:
-        print(f"[AUTOINSTALL] Could not install '{pip_name}': {e}")
+        print(f"[AUTOINSTALL] Failed to install {pkg}: {e}")
         return False
 
-
 def ensure_dependencies():
-    print("[AUTOINSTALL] Checking dependencies... (#RADHEY)")
-    for module_name, pip_name in REQUIRED_PACKAGES.items():
+    print("[AUTOINSTALL] Checking deps... #RADHEY")
+    for mod, pkg in REQUIRED_PACKAGES.items():
         try:
-            importlib.import_module(module_name)
+            importlib.import_module(mod)
         except ImportError:
-            print(f"[AUTOINSTALL] '{module_name}' missing -> installing '{pip_name}' ...")
-            if _pip_install(pip_name):
-                try:
-                    importlib.import_module(module_name)
-                    print(f"[AUTOINSTALL] '{module_name}' installed OK.")
-                except ImportError as e:
-                    print(f"[AUTOINSTALL] WARNING: still not importable: {e}")
-    print("[AUTOINSTALL] Done.\n")
+            print(f"[AUTOINSTALL] Installing {pkg}...")
+            _install(pkg)
+    print("[AUTOINSTALL] All good!\n")

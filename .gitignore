@@ -1,0 +1,8 @@
+.env
+*.session
+*.session-journal
+radhey_bot.db
+downloads/
+__pycache__/
+*.pyc
+.DS_Store

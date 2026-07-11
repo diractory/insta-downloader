@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: radhey-instagram-bot
+    name: radhey-bot
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
@@ -13,8 +13,6 @@ services:
       - key: BOT_TOKEN
         sync: false
       - key: OWNER_IDS
-        sync: false
-      - key: SUDO_USERS
         sync: false
       - key: FORCE_SUB_CHANNEL
         value: xivasudev

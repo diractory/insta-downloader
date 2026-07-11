@@ -1,1 +1,1 @@
-# #RADHEY — plugins package
+# plugins package
