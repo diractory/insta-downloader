@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Radhey — Instagram Downloader &amp; Group Guardian Bot</title>
+<meta name="description" content="Download Instagram reels instantly and moderate your Telegram groups — all in one bot." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0E0F13;
+    --panel: #16181F;
+    --panel-2: #1C1F28;
+    --border: #262A34;
+    --text: #EDEDEF;
+    --muted: #8B8F9B;
+    --ig-1: #F0356B;
+    --ig-2: #FFA35C;
+    --tg-blue: #2AA9EE;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3, .display{
+    font-family:'Space Grotesk', sans-serif;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  a{color:inherit;}
+  .accent-text{
+    background:linear-gradient(90deg, var(--ig-1), var(--ig-2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .wrap{max-width:1120px; margin:0 auto; padding:0 24px;}
+
+  /* ── NAV ─────────────────────────────── */
+  nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(14,15,19,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-inner{display:flex; align-items:center; justify-content:space-between; padding:16px 24px; max-width:1120px; margin:0 auto;}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px;}
+  .brand-dot{width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,var(--ig-1),var(--ig-2)); box-shadow:0 0 12px rgba(240,53,107,0.6);}
+  .nav-links{display:flex; gap:28px; font-size:14px; color:var(--muted);}
+  .nav-links a:hover{color:var(--text);}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 20px; border-radius:999px; font-weight:600; font-size:14px;
+    text-decoration:none; border:1px solid transparent; cursor:pointer;
+  }
+  .btn-primary{ background:linear-gradient(90deg,var(--ig-1),var(--ig-2)); color:#fff; }
+  .btn-primary:hover{ filter:brightness(1.08); }
+  .btn-ghost{ border-color:var(--border); color:var(--text); }
+  .btn-ghost:hover{ border-color:var(--tg-blue); }
+
+  /* ── HERO ─────────────────────────────── */
+  .hero{ padding:88px 0 64px; position:relative; overflow:hidden;}
+  .hero::before{
+    content:""; position:absolute; top:-160px; right:-160px; width:480px; height:480px;
+    background:radial-gradient(circle, rgba(240,53,107,0.18), transparent 70%);
+    pointer-events:none;
+  }
+  .hero-grid{ display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--tg-blue);
+    border:1px solid rgba(42,169,238,0.35); background:rgba(42,169,238,0.08);
+    padding:6px 12px; border-radius:999px; margin-bottom:20px;
+  }
+  .hero h1{ font-size:48px; font-weight:700; line-height:1.08; }
+  .hero p.lead{ margin-top:20px; color:var(--muted); font-size:17px; max-width:480px; }
+  .hero-ctas{ display:flex; gap:14px; margin-top:32px; flex-wrap:wrap; }
+  .hero-stats{ display:flex; gap:32px; margin-top:44px; }
+  .stat-num{ font-family:'Space Grotesk'; font-size:24px; font-weight:700; }
+  .stat-label{ font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; }
+
+  /* ── Chat mockup (signature element) ─────────────────────────────── */
+  .chat-mock{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:18px; box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
+  }
+  .chat-head{ display:flex; align-items:center; gap:10px; padding-bottom:14px; border-bottom:1px solid var(--border); margin-bottom:14px;}
+  .chat-avatar{ width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--ig-1),var(--ig-2)); display:flex; align-items:center; justify-content:center; font-weight:700;}
+  .chat-name{ font-weight:600; font-size:14px; }
+  .chat-status{ font-size:12px; color:#4ADE80; }
+  .bubble{ max-width:82%; padding:10px 14px; border-radius:14px; font-size:13.5px; margin-bottom:10px; }
+  .bubble.user{ background:var(--tg-blue); color:#04121b; margin-left:auto; border-bottom-right-radius:4px; }
+  .bubble.bot{ background:var(--panel-2); border:1px solid var(--border); border-bottom-left-radius:4px; }
+  .bar-track{ height:8px; border-radius:99px; background:#2A2E38; overflow:hidden; margin:8px 0 6px; }
+  .bar-fill{ height:100%; width:72%; border-radius:99px; background:linear-gradient(90deg,var(--ig-1),var(--ig-2)); animation:grow 2.4s ease-in-out infinite alternate; }
+  @keyframes grow{ from{width:38%;} to{width:86%;} }
+  .bubble.bot .cap-btn{ display:inline-block; margin-top:8px; font-size:12px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; color:var(--muted); }
+
+  /* ── SECTIONS ─────────────────────────────── */
+  section{ padding:72px 0; border-top:1px solid var(--border); }
+  .section-head{ max-width:560px; margin-bottom:44px; }
+  .section-eyebrow{ font-family:'JetBrains Mono'; font-size:12px; color:var(--ig-2); margin-bottom:10px; display:block;}
+  .section-head h2{ font-size:32px; font-weight:700; }
+  .section-head p{ color:var(--muted); margin-top:12px; }
+
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:24px;
+    transition:border-color .2s, transform .2s;
+  }
+  .card:hover{ border-color:rgba(240,53,107,0.4); transform:translateY(-2px); }
+  .card .icon{ width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:16px; background:var(--panel-2); border:1px solid var(--border);}
+  .card h3{ font-size:16px; font-weight:600; margin-bottom:8px; }
+  .card p{ font-size:13.5px; color:var(--muted); }
+
+  /* commands table */
+  .cmd-table{ width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden;}
+  .cmd-table th{ text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); padding:14px 18px; background:var(--panel-2); font-weight:600;}
+  .cmd-table td{ padding:14px 18px; border-top:1px solid var(--border); font-size:14px; vertical-align:top;}
+  .cmd-table td.cmd{ font-family:'JetBrains Mono'; color:var(--ig-2); white-space:nowrap; }
+  .tag{ display:inline-block; font-size:11px; padding:2px 8px; border-radius:6px; background:rgba(42,169,238,0.12); color:var(--tg-blue); font-family:'JetBrains Mono';}
+
+  /* steps */
+  .steps{ counter-reset:step; display:grid; gap:18px; }
+  .step{ display:grid; grid-template-columns:44px 1fr; gap:18px; align-items:start; }
+  .step-num{
+    counter-increment:step; width:44px; height:44px; border-radius:12px; background:var(--panel-2); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; color:var(--ig-2);
+  }
+  .step h3{ font-size:15px; margin-bottom:4px; }
+  .step p{ color:var(--muted); font-size:13.5px; margin:0; }
+  .step code{ background:var(--panel-2); border:1px solid var(--border); padding:2px 6px; border-radius:6px; font-family:'JetBrains Mono'; font-size:12.5px; color:var(--text); }
+
+  footer{ border-top:1px solid var(--border); padding:40px 0; }
+  .footer-inner{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+  .footer-links{ display:flex; gap:20px; font-size:13.5px; color:var(--muted); }
+  .footer-links a:hover{ color:var(--text); }
+  .status-pill{ display:inline-flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); font-family:'JetBrains Mono';}
+  .status-dot{ width:8px; height:8px; border-radius:50%; background:#4ADE80; box-shadow:0 0 8px #4ADE80; }
+
+  @media (max-width: 860px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .grid-3{ grid-template-columns:1fr; }
+    .hero h1{ font-size:34px; }
+    .nav-links{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><span class="brand-dot"></span> RADHEY</div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#commands">Commands</a>
+      <a href="#setup">Setup</a>
+      <a href="/health">Status</a>
+    </div>
+    <a class="btn btn-primary" href="https://t.me/Youradhey" target="_blank">Message Owner</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">● LIVE ON TELEGRAM · #RADHEY</span>
+      <h1>One bot.<br>Every <span class="accent-text">reel</span> downloaded.<br>Every group <span class="accent-text">kept in order</span>.</h1>
+      <p class="lead">Drop an Instagram link in any chat and Radhey pulls it down with a live progress bar. Add it as admin to your group and it handles moderation too — mutes, bans, warnings, purges, all of it.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="https://t.me/xivasudev" target="_blank">Join Channel to Start →</a>
+        <a class="btn btn-ghost" href="#commands">View Commands</a>
+      </div>
+      <div class="hero-stats">
+        <div><div class="stat-num">2</div><div class="stat-label">Download Engines</div></div>
+        <div><div class="stat-num">12+</div><div class="stat-label">Admin Commands</div></div>
+        <div><div class="stat-num">0</div><div class="stat-label">Manual Installs</div></div>
+      </div>
+    </div>
+
+    <div class="chat-mock">
+      <div class="chat-head">
+        <div class="chat-avatar">R</div>
+        <div>
+          <div class="chat-name">Radhey Downloader</div>
+          <div class="chat-status">● online</div>
+        </div>
+      </div>
+      <div class="bubble user">instagram.com/reel/Cx7aB2.../</div>
+      <div class="bubble bot">
+        <strong>⬇️ Downloading...</strong>
+        <div class="bar-track"><div class="bar-fill"></div></div>
+        <span class="mono" style="color:var(--muted); font-size:12px;">18.4 MB / 24.1 MB</span>
+      </div>
+      <div class="bubble bot">
+        🎬 Here's your reel!
+        <div class="cap-btn">📝 Show Caption</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-eyebrow">// WHAT IT DOES</span>
+      <h2>Built for both DMs and busy groups</h2>
+      <p>Every feature below works the moment the bot is invited — no extra config beyond making it an admin where needed.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="icon">📥</div>
+        <h3>Instant Reel Downloads</h3>
+        <p>Paste a link, watch a live progress bar for both the download and the Telegram upload, get the file with one tap.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📝</div>
+        <h3>Caption on Demand</h3>
+        <p>Every download ships with a "Show Caption" button so the original post text is never lost, but never clutters the chat either.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🛡️</div>
+        <h3>Full Group Moderation</h3>
+        <p>Mute, ban, unban, kick, promote, warn, purge, and pin — the same toolkit you'd expect from a dedicated group-management bot.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔒</div>
+        <h3>Force-Subscribe Gate</h3>
+        <p>New users are asked to join the official channel before their first DM download — one tap, then they're in.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📢</div>
+        <h3>Owner Broadcast Tools</h3>
+        <p>Reach every user or every group the bot is in with a single reply-and-send command.</p>
+      </div>
+      <div class="card">
+        <div class="icon">⚙️</div>
+        <h3>Self-Installing</h3>
+        <p>Missing a Python package? The bot installs it the moment it boots — no manual <span class="mono">pip install</span> required.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="commands">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-eyebrow">// REFERENCE</span>
+      <h2>Command reference</h2>
+      <p>Group-admin commands work by replying to a member's message, or passing their @username / numeric ID.</p>
+    </div>
+    <table class="cmd-table">
+      <tr><th>Command</th><th>Access</th><th>Description</th></tr>
+      <tr><td class="cmd">/start</td><td><span class="tag">everyone</span></td><td>Starts the bot, shows your Telegram info + profile picture</td></tr>
+      <tr><td class="cmd">(paste a link)</td><td><span class="tag">everyone</span></td><td>Downloads the Instagram reel/post with a live progress bar</td></tr>
+      <tr><td class="cmd">/mute · /unmute</td><td><span class="tag">group admin</span></td><td>Restrict or restore a member's messaging rights</td></tr>
+      <tr><td class="cmd">/ban · /unban · /kick</td><td><span class="tag">group admin</span></td><td>Remove members from the group</td></tr>
+      <tr><td class="cmd">/promote · /demote</td><td><span class="tag">group admin</span></td><td>Grant or revoke admin rights</td></tr>
+      <tr><td class="cmd">/warn · /resetwarn</td><td><span class="tag">group admin</span></td><td>Track warnings — 3 strikes auto-bans</td></tr>
+      <tr><td class="cmd">/purge · /pin · /unpin</td><td><span class="tag">group admin</span></td><td>Bulk cleanup and pinned-message control</td></tr>
+      <tr><td class="cmd">/broadcast · /gbroadcast</td><td><span class="tag">owner</span></td><td>Message every user / every group</td></tr>
+      <tr><td class="cmd">/stats · /id · /info · /ping</td><td><span class="tag">everyone / owner</span></td><td>Utility &amp; diagnostics commands</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="setup">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-eyebrow">// DEPLOYMENT</span>
+      <h2>Live in four steps</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div><h3>Get API credentials</h3><p>Create an app at <code>my.telegram.org</code> for <code>API_ID</code> / <code>API_HASH</code>, and a token from <code>@BotFather</code>.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div><h3>Set environment variables</h3><p>Copy <code>.env.example</code>, fill in your credentials and owner ID.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div><h3>Push to Render</h3><p>Connect your repo — <code>render.yaml</code> configures the build and start commands automatically.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div><h3>Promote it in your group</h3><p>Add the bot, make it admin, and every moderation command unlocks instantly.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="status-pill"><span class="status-dot"></span> Service Online</div>
+    <div class="footer-links">
+      <a href="https://t.me/Youradhey" target="_blank">@Youradhey</a>
+      <a href="https://t.me/sunradhey" target="_blank">@sunradhey</a>
+      <a href="https://t.me/xivasudev" target="_blank">Channel</a>
+    </div>
+    <div class="mono" style="color:var(--muted); font-size:12px;">#RADHEY</div>
+  </div>
+</footer>
+
+</body>
+</html>

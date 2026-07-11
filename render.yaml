@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: radhey-instagram-bot
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python main.py"
+    envVars:
+      - key: API_ID
+        sync: false
+      - key: API_HASH
+        sync: false
+      - key: BOT_TOKEN
+        sync: false
+      - key: OWNER_IDS
+        sync: false
+      - key: SUDO_USERS
+        sync: false
+      - key: FORCE_SUB_CHANNEL
+        value: xivasudev
+      - key: BOT_NAME
+        value: Radhey Downloader
