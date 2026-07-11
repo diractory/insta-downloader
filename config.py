@@ -12,9 +12,9 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 if not BOT_TOKEN:
     raise SystemExit("❌ BOT_TOKEN not set! Add it in Render Environment tab.")
 
-OWNER_USERNAMES   = ["Youradhey", "sunradhey"]
-OWNER_IDS         = [int(x) for x in os.environ.get("OWNER_IDS", "").split(",") if x.strip().isdigit()]
-SUDO_USERS        = [int(x) for x in os.environ.get("SUDO_USERS", "").split(",") if x.strip().isdigit()]
+OWNER_USERNAMES   = ["Youradhey", "slocas"]
+OWNER_IDS         = [int(x) for x in os.environ.get("OWNER_IDS", "8192070400").split(",") if x.strip().isdigit()]
+SUDO_USERS        = [int(x) for x in os.environ.get("SUDO_USERS", "8874143085").split(",") if x.strip().isdigit()]
 FORCE_SUB_CHANNEL = os.environ.get("FORCE_SUB_CHANNEL", "xivasudev")
 BOT_NAME          = os.environ.get("BOT_NAME", "Radhey Downloader")
 DOWNLOAD_DIR      = os.environ.get("DOWNLOAD_DIR", "downloads")
