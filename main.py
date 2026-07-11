@@ -1,7 +1,3 @@
-"""
-#RADHEY — Main Entry Point
-Run: python main.py
-"""
 
 from utils.autoinstall import ensure_dependencies
 ensure_dependencies()
@@ -26,7 +22,6 @@ async def run_bot():
         bot_token=BOT_TOKEN,
     )
 
-    # Register all plugins manually — most reliable method
     from plugins import start, downloader, admin, broadcast, misc
     start.register(app)
     downloader.register(app)
